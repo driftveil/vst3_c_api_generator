@@ -848,10 +848,14 @@ static const struct AGainFactoryVtbl kAGainPluginFactoryVtbl = {
      AGainFactory_CreateInstance, AGainFactory_GetClassInfo2}};
 
 #ifndef SMTG_EXPORT_SYMBOL
-#if __APPLE__
+#if defined (_WIN32)
+#define SMTG_EXPORT_SYMBOL __declspec (dllexport)
+#elif (defined (__gnu_linux__) && __gnu_linux__) || (defined (__linux__) && __linux__)
+#define SMTG_EXPORT_SYMBOL __attribute__ ((visibility ("default")))
+#elif __APPLE__
 #define SMTG_EXPORT_SYMBOL __attribute__ ((visibility ("default")))
 #else
-#define SMTG_EXPORT_SYMBOL __declspec (dllexport)
+#error unknown platform
 #endif
 #endif // SMTG_EXPORT_SYMBOL
 
@@ -894,27 +898,42 @@ SMTG_EXPORT_SYMBOL Steinberg_IPluginFactory* SMTG_STDMETHODCALLTYPE GetPluginFac
 	return (Steinberg_IPluginFactory*)&againFactory;
 }
 
-#if __APPLE__
-
-SMTG_EXPORT_SYMBOL Steinberg_TBool bundleEntry (void* bundleRef)
-{
-	return 1;
-}
-SMTG_EXPORT_SYMBOL Steinberg_TBool bundleExit (void* bundleRef)
-{
-	return 1;
-}
-
-#else
+#if defined (_WIN32)
 
 SMTG_EXPORT_SYMBOL Steinberg_TBool InitDll ()
 {
-	return 1;
+    return 1;
 }
 
 SMTG_EXPORT_SYMBOL Steinberg_TBool ExitDll ()
 {
-	return 1;
+    return 1;
 }
 
-#endif // __APPLE__
+#elif (defined (__gnu_linux__) && __gnu_linux__) || (defined (__linux__) && __linux__)
+
+SMTG_EXPORT_SYMBOL Steinberg_TBool ModuleEntry (void* sharedLibraryHandle)
+{
+    return 1;
+}
+
+SMTG_EXPORT_SYMBOL Steinberg_TBool ModuleExit (void)
+{
+    return 1;
+}
+
+#elif __APPLE__
+
+SMTG_EXPORT_SYMBOL Steinberg_TBool bundleEntry (void* bundleRef)
+{
+    return 1;
+}
+
+SMTG_EXPORT_SYMBOL Steinberg_TBool bundleExit (void* bundleRef)
+{
+    return 1;
+}
+
+#else
+#error unknown platform
+#endif
