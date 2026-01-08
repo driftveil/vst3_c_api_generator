@@ -929,7 +929,7 @@ SMTG_EXPORT_SYMBOL Steinberg_TBool bundleEntry (void* bundleRef)
     return 1;
 }
 
-SMTG_EXPORT_SYMBOL Steinberg_TBool bundleExit (void* bundleRef)
+SMTG_EXPORT_SYMBOL Steinberg_TBool bundleExit (void)
 {
     return 1;
 }
